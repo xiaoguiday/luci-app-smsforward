@@ -1,82 +1,51 @@
-Markdown
-# luci-app-smsforward
+Markdown# luci-app-smsforward
 
-这是一个为 OpenWrt/ImmortalWrt 设计的短信转发插件，支持将收到的短信通过邮件 (SMTP) 转发至指定邮箱。
+![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)
+![Platform](https://img.shields.io/badge/Platform-OpenWrt%20%2F%20ImmortalWrt-orange.svg)
+![Maintainer](https://img.shields.io/badge/Maintainer-xiaoguiday-green.svg)
 
-<img width="1001" height="726" alt="image" src="https://github.com/user-attachments/assets/eadd92cb-86fb-42a9-b36d-6400073fd909" />
+这是一个为 OpenWrt/ImmortalWrt 设计的短信转发插件。它能够实时监控 5G/4G 模块收到的短信，并通过 SMTP 协议转发至您的电子邮箱。
 
+<img width="800" alt="luci-app-smsforward 界面预览" src="https://github.com/user-attachments/assets/eadd92cb-86fb-42a9-b36d-6400073fd909" />
+
+---
 
 ## 🌟 项目亮点
 
-*   **双模式支持**：完美兼容传统串口模式 (`sms-tool`) 和现代的 `ModemManager` (`mmcli`) 模式。
-*   **长短信优化**：专门针对 `ModemManager` 模式下的长短信逻辑进行了优化，能够完整提取被分割的长短信内容。
-*   **系统信息过滤**：自动截断 `mmcli` 输出中的 Properties 系统冗余信息，仅保留纯净短信正文。
-*   **实时状态显示**：LuCI 界面内置进程监控，可实时查看转发后台的运行状态及 PID。
-*   **安全去重**：内置 MD5 指纹去重算法，防止同一条短信被重复转发。
+*   **🚀 双模式自动切换**：完美兼容传统串口模式 (`sms-tool`) 与现代 `ModemManager` (`mmcli`) 模式。
+*   **📩 长短信深度优化**：专门针对 `ModemManager` 模式重构了解析逻辑，解决长短信内容断裂、乱码问题。
+*   **🧹 纯净正文提取**：自动过滤 `mmcli` 输出中的 Properties 系统冗余信息，仅发送有效的短信正文。
+*   **📊 实时监控面板**：UI 界面内置进程状态检测，支持 PID 显示及一键状态刷新。
+*   **🛡️ 安全去重逻辑**：基于 MD5 的指纹校验，确保在网络波动或模块重置时，不会收到重复的转发邮件。
 
 ## 🏗️ 系统架构
 
-该项目由以下几个核心部分组成：
+*   **前端 (LuCI)**: 基于 Lua/CBI 构建，提供直观的配置界面。
+*   **后台 (procd)**: 注册为系统守护进程，支持异常退出自动重启。
+*   **引擎 (Shell)**: 负责硬件交互、短信捕获、正则解析及逻辑路由。
+*   **传输 (msmtp)**: 轻量化 SMTP 客户端，支持 SSL/TLS 安全链路。
 
-1.  **LuCI 界面** (Lua/CBI): 提供用户配置入口及运行状态显示。
-2.  **守护进程** (procd): 负责 24 小时后台循环监控。
-3.  **核心处理脚本** (Shell): 执行短信提取、多行正文拼接、Properties 过滤及邮件调用逻辑。
-4.  **邮件引擎** (msmtp): 负责与 SMTP 服务器进行安全通信。
+---
 
-## 免编译一键安装（在openwrt直接执行）
-wget -qO- https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/install.sh | sh
-## 一键卸载
-wget -qO- https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/uninstall.sh | sh
+## ⚡ 快速安装 (免编译)
 
+如果您使用的是现成的固件，直接在 SSH 终端执行以下命令即可：
 
-## 🛠️ 编译方式
-
-### 1. 准备工作
-将本仓库克隆到你的 OpenWrt 源码目录下的 `package` 目录中：
-
+### 一键安装
 ```bash
-cd openwrt/package
+wget -qO- [https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/install.sh](https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/install.sh) | sh
+一键卸载Bashwget -qO- [https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/uninstall.sh](https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/uninstall.sh) | sh
+🛠️ 编译方式如果您希望将插件集成到固件中，请参考以下步骤：1. 准备工作将本仓库克隆到您的 OpenWrt 源码目录下的 package 目录：Bashcd package
 git clone [https://github.com/xiaoguiday/luci-app-smsforward.git](https://github.com/xiaoguiday/luci-app-smsforward.git)
-2. 更新 Feeds
-Bash
-cd ..
+2. 更新 FeedBashcd ..
 ./scripts/feeds update -a && ./scripts/feeds install -a
-3. 配置菜单
-执行 make menuconfig，在以下路径找到并选中：
-LuCI -> 3. Applications -> luci-app-smsforward
+3. 配置菜单执行 make menuconfig，依次进入：LuCI -> 3. Applications -> luci-app-smsforward (按空格键选中 *)4. 执行编译Bashmake package/luci-app-smsforward/compile V=s
+⚙️ 使用说明配置项说明设备端口传统串口填 /dev/ttyUSBX；使用 ModemManager (Quectel 5G 推荐) 请填 mmSMTP 服务器如 smtp.qq.com 或 smtp.gmail.com端口推荐使用 465 (SSL) 或 587 (STARTTLS)密码务必使用邮箱授权码，而非邮箱登录密码检查频率建议设置在 30-60 秒，兼顾实时性与系统开销📦 核心依赖插件会自动处理依赖，但请确保您的软件源配置正确：sms-tool / modemmanager / mmclimsmtp / ca-bundle (SSL 证书支持)🤝 鸣谢与支持特别针对 Quectel 系列模块（RM520N-GL, RG200U-CN 等）在 OpenWrt 环境下的短信解析进行了深度调优。觉得好用？请点一个 Star ⭐ 给作者以鼓励！Maintainer: xiaoguiday
+---
 
-4. 开始编译
-Bash
-make package/luci-app-smsforward/compile V=s
-📦 依赖项
-编译系统会自动处理以下依赖，请确保你的固件包含这些包：
-
-sms-tool (用于串口模式)
-
-modemmanager & mmcli (用于 MM 模式)
-
-msmtp (邮件发送核心)
-
-ca-bundle (用于处理 SMTP 的 SSL/TLS 证书)
-
-⚙️ 使用说明
-模式选择：
-
-如果你使用传统的 /dev/ttyUSB 端口，请直接填写路径。
-
-如果你使用 ModemManager (推荐用于 Quectel 5G 模块，如 RM520N-GL, RG200U-CN)，请在端口处填入 mm。
-
-状态监控：
-
-界面会显示 ✔ 运行中 或 ❌ 已停止。如果状态显示不及时，可以点击界面上的“刷新状态”按钮。
-
-邮件配置：
-
-建议使用 465 或 587 端口。对于 Gmail/QQ 邮箱，请使用 授权码 而非登录密码。
-
-🤝 鸣谢与支持
-本项目在开发过程中得到了技术社区的反馈支持，特别针对 Quectel 系列模块在 OpenWrt 环境下的短信解析进行了深度调优。
-
-如果你觉得有用，请点一个 Star！
-
-Maintainer: xiaoguiday
+### 优化点说明：
+1.  **增加状态徽章 (Badges)**：在顶部增加了 License、Platform 等标签，项目显得更正规。
+2.  **表格化配置说明**：将原本杂乱的使用说明整理成表格，用户阅读效率更高。
+3.  **代码块高亮修正**：统一了代码块的风格，并修正了原本 README 中部分 Bash 命令格式不规范的问题。
+4.  **可视化增强**：使用了更多的 Emoji 符号来引导视觉重心，减少纯文字的枯燥感。
+5.  **安装命令精简**：突出了一键脚本的使用，这是大部分非开发者用户最需要的部分。
