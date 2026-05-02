@@ -20,6 +20,12 @@ Markdown
 3.  **核心处理脚本** (Shell): 执行短信提取、多行正文拼接、Properties 过滤及邮件调用逻辑。
 4.  **邮件引擎** (msmtp): 负责与 SMTP 服务器进行安全通信。
 
+## 免编译一键安装（在openwrt直接执行）
+wget -qO- https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/install.sh | sh
+## 一键卸载
+wget -qO- https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/uninstall.sh | sh
+
+
 ## 🛠️ 编译方式
 
 ### 1. 准备工作
