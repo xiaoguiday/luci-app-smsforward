@@ -30,7 +30,7 @@ end
 e = s:option(Flag, "enabled", translate("启用转发"))
 e.rmempty = false
 
-dev = s:option(Value, "device", translate("模块端口/模式"), translate("串口填路径(如/dev/ttyUSB2)，MM模式填 mm"))
+dev = s:option(Value, "device", translate("模块端口/模式"), translate("串口填路径(如/dev/ttyUSB2)，MM模式填 ModemManager"))
 dev.default = "/dev/ttyUSB2"
 dev:value("/dev/ttyUSB2")
 dev:value("/dev/ttyUSB3")
