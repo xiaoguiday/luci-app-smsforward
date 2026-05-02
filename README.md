@@ -3,6 +3,9 @@ Markdown
 
 这是一个为 OpenWrt/ImmortalWrt 设计的短信转发插件，支持将收到的短信通过邮件 (SMTP) 转发至指定邮箱。
 
+<img width="1001" height="726" alt="image" src="https://github.com/user-attachments/assets/eadd92cb-86fb-42a9-b36d-6400073fd909" />
+
+
 ## 🌟 项目亮点
 
 *   **双模式支持**：完美兼容传统串口模式 (`sms-tool`) 和现代的 `ModemManager` (`mmcli`) 模式。
