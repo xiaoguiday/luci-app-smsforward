@@ -1,4 +1,4 @@
-Markdown# luci-app-smsforward
+ luci-app-smsforward
 
 ![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)
 ![Platform](https://img.shields.io/badge/Platform-OpenWrt%20%2F%20ImmortalWrt-orange.svg)
