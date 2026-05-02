@@ -6,6 +6,8 @@
 
 这是一个为 **OpenWrt / ImmortalWrt** 设计的短信转发插件。  
 它能够实时监控 4G / 5G 模块收到的短信，并通过 SMTP 协议转发到邮箱。
+<img width="1054" height="737" alt="image" src="https://github.com/user-attachments/assets/2cb39e2d-a8a4-4980-a39a-47534d550e95" />
+
 
 ---
 
