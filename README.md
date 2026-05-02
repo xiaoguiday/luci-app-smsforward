@@ -8,6 +8,7 @@
 它能够实时监控 4G / 5G 模块收到的短信，并通过 SMTP 协议转发到邮箱。
 <img width="1054" height="737" alt="image" src="https://github.com/user-attachments/assets/2cb39e2d-a8a4-4980-a39a-47534d550e95" />
 
+<img width="1581" height="177" alt="image" src="https://github.com/user-attachments/assets/fb63a156-58ca-4f1a-9cac-b70d3bb2e99a" />
 
 ---
 
