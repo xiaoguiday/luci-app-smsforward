@@ -88,11 +88,11 @@ make package/luci-app-smsforward/compile V=s
 
 | 项目 | 说明 |
 |------|------|
-| 设备端口 | /dev/ttyUSBX 或 mm |
+| 设备端口 | /dev/ttyUSBX 或 modemmanager |
 | SMTP服务器 | smtp.qq.com / smtp.gmail.com |
 | SMTP端口 | 465 / 587 |
-| 密码 | 邮箱授权码 |
-| 检查间隔 | 30–60 秒 |
+| 密码 | 邮箱授权码 gmail邮箱请创建应用密码 |
+| 检查间隔 | 0–60 秒 |
 
 ---
 
