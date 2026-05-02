@@ -1,38 +1,10 @@
-#!/bin/sh /etc/rc.common
-
-START=99
-USE_PROCD=1
-
-start_service() {
-    # 加载 /etc/config/smsforward
-    config_load 'smsforward'
-    
-    local enabled interval
-    # 注意：这里第二个参数必须对应你 cat 出来的那个 'config'
-    config_get_bool enabled 'config' 'enabled' 0
-    config_get interval 'config' 'interval' 60
-
-    # 调试输出：你可以用 logread 看到它到底读到了什么
-    # logger "SMS Forwarder check: enabled=$enabled, interval=$interval"
-
-    [ "$enabled" -eq 1 ] || return 0
-
-    chmod +x /usr/bin/sms_handler.sh
-
-    procd_open_instance
-    # 强制使用完整路径，防止环境变量丢失
-    procd_set_param command /bin/sh -c "while true; do 
-        /usr/bin/sms_handler.sh
-        SLEEP_TIME=\$(uci -q get smsforward.config.interval)
-        sleep \${SLEEP_TIME:-60}
-    done"
-    
-    procd_set_param respawn 3600 5 0
-    procd_set_param stdout 1
-    procd_set_param stderr 1
-    procd_close_instance
-}
-
-service_triggers() {
-    procd_add_reload_trigger "smsforward"
-}
+config smsforward 'config'
+	option enabled '0'
+	option device '/dev/ttyUSB2'
+	option server 'smtp.gmail.com'
+	option port '587'
+	option interval '60'
+	option user ''
+	option password ''
+	option target_email ''
+	option sender_email ''
