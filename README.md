@@ -4,7 +4,8 @@
 ![Platform](https://img.shields.io/badge/Platform-OpenWrt%20%2F%20ImmortalWrt-orange.svg)
 ![Maintainer](https://img.shields.io/badge/Maintainer-xiaoguiday-green.svg)
 
-这是一个为 **OpenWrt/ImmortalWrt** 设计的短信转发插件。它能够实时监控 5G/4G 模块收到的短信，并通过 SMTP 协议转发至您的电子邮箱。
+这是一个为 **OpenWrt / ImmortalWrt** 设计的短信转发插件。  
+它能够实时监控 4G / 5G 模块收到的短信，并通过 SMTP 协议转发到您的邮箱。
 
 <img width="800" alt="luci-app-smsforward 界面预览" src="https://github.com/user-attachments/assets/eadd92cb-86fb-42a9-b36d-6400073fd909" />
 
@@ -12,37 +13,86 @@
 
 ## 🌟 项目亮点
 
-*   **🚀 双模式自动切换**：完美兼容传统串口模式 (`sms-tool`) 与现代 `ModemManager` (`mmcli`) 模式。
-*   **📩 长短信深度优化**：专门针对 `ModemManager` 模式重构了解析逻辑，解决长短信内容断裂、乱码问题。
-*   **🧹 纯净正文提取**：自动过滤 `mmcli` 输出中的 `Properties` 系统冗余信息，仅发送有效的短信正文。
-*   **📊 实时监控面板**：UI 界面内置进程状态检测，支持 PID 显示及一键状态刷新。
-*   **🛡️ 安全去重逻辑**：基于 MD5 的指纹校验，确保在网络波动或模块重置时，不会收到重复的转发邮件。
+- 🚀 **双模式自动切换**  
+  完美兼容传统串口模式（sms-tool）与现代 ModemManager（mmcli）模式
+
+- 📩 **长短信深度优化**  
+  针对 mmcli 输出重构解析逻辑，解决长短信断裂与乱码问题
+
+- 🧹 **纯净正文提取**  
+  自动过滤 mmcli 的 Properties 等冗余信息，仅保留短信正文
+
+- 📊 **实时监控面板**  
+  LuCI UI 内置进程状态检测，支持 PID 显示与一键刷新
+
+- 🛡️ **安全去重机制**  
+  基于 MD5 指纹校验，避免重复短信邮件推送
 
 ---
 
 ## 🏗️ 系统架构
 
-*   **前端 (LuCI)**：基于 Lua/CBI 构建，提供直观的配置界面。
-*   **后台 (procd)**：注册为系统守护进程，支持异常退出自动重启。
-*   **引擎 (Shell)**：负责硬件交互、短信捕获、正则解析及逻辑路由。
-*   **传输 (msmtp)**：轻量化 SMTP 客户端，支持 SSL/TLS 安全链路。
+- **前端（LuCI）**  
+  基于 Lua / CBI 构建的可视化配置界面
+
+- **后台（procd）**  
+  作为系统守护进程运行，支持异常自动重启
+
+- **引擎（Shell）**  
+  负责短信捕获、设备通信、解析与逻辑路由
+
+- **传输（msmtp）**  
+  轻量 SMTP 客户端，支持 SSL / TLS 加密发送
 
 ---
 
-## ⚡ 快速安装 (免编译)
+## ⚡ 快速安装（免编译）
 
-如果您使用的是现成的固件，直接在 SSH 终端执行以下命令即可：
+适用于已刷 OpenWrt / ImmortalWrt 固件用户：
 
 ### 一键安装
 ```bash
-wget -qO- [https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/install.sh](https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/install.sh) | sh
-### 一键卸载
-```bash
-wget -qO- [https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/uninstall.sh](https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/uninstall.sh) | sh
+wget -qO- https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/install.sh | sh
+一键卸载
+wget -qO- https://raw.githubusercontent.com/xiaoguiday/luci-app-smsforward/main/uninstall.sh | sh
+🛠️ 编译方式
+1. 克隆源码
+cd package
+git clone https://github.com/xiaoguiday/luci-app-smsforward.git
+2. 更新 feeds
+cd ..
+./scripts/feeds update -a
+./scripts/feeds install -a
+3. 进入菜单配置
+make menuconfig
 
-🛠️ 编译方式如果您希望将插件集成到固件中，请参考以下步骤：1. 准备工作将本仓库克隆到您的 OpenWrt 源码目录下的 package 目录：Bashcd package
-git clone [https://github.com/xiaoguiday/luci-app-smsforward.git](https://github.com/xiaoguiday/luci-app-smsforward.git)
-2. 更新 FeedBashcd ..
-./scripts/feeds update -a && ./scripts/feeds install -a
-3. 配置菜单执行 make menuconfig，依次进入：LuCI -> 3. Applications -> luci-app-smsforward (按空格键选中 *)4. 执行编译Bashmake package/luci-app-smsforward/compile V=s
-⚙️ 使用说明配置项说明设备端口传统串口填 /dev/ttyUSBX；使用 ModemManager (Quectel 5G 推荐) 请填 mmSMTP 服务器如 smtp.qq.com 或 smtp.gmail.com端口推荐使用 465 (SSL) 或 587 (STARTTLS)密码务必使用邮箱授权码，而非邮箱登录密码检查频率建议设置在 30-60 秒，兼顾实时性与系统开销📦 核心依赖插件会自动处理依赖，但请确保您的软件源配置正确：sms-tool / modemmanager / mmclimsmtp / ca-bundle (SSL 证书支持)🤝 鸣谢与支持特别针对 Quectel 系列模块（RM520N-GL, RG200U-CN 等）在 OpenWrt 环境下的短信解析进行了深度调优。觉得好用？请点一个 Star ⭐ 给作者以鼓励！Maintainer: xiaoguiday
+路径：
+
+LuCI -> 3. Applications -> luci-app-smsforward
+
+按空格选择 *
+
+4. 编译
+make package/luci-app-smsforward/compile V=s
+⚙️ 使用说明
+配置项	说明
+设备端口	/dev/ttyUSBX 或 mm（ModemManager 模式）
+SMTP服务器	如 smtp.qq.com / smtp.gmail.com
+SMTP端口	推荐 465 (SSL) 或 587 (STARTTLS)
+密码	邮箱授权码（不是登录密码）
+检查间隔	建议 30–60 秒
+📦 核心依赖
+sms-tool
+modemmanager / mmcli
+msmtp
+ca-bundle（SSL 证书支持）
+🤝 鸣谢
+
+本项目针对以下设备进行了优化适配：
+
+Quectel RM520N-GL
+Quectel RG200U 系列
+OpenWrt / ImmortalWrt 环境短信解析优化
+⭐ 支持项目
+
+如果这个项目对你有帮助，请给一个 Star ⭐ 支持作者继续更新。
